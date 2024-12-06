@@ -1,1 +1,12 @@
+.hero {
+    background-color: orange;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.hero h1 {
+    color: white;
+    font-size: 4rem;
+}
