@@ -34,15 +34,15 @@
         
                     <div class="mb-3">
                         <label for="sampleText" class="form-label">Test your typing speed by typing the text shown below:</label>
-                        <input id="sampleText" class="form-control pt-3 pb-3" type="text" value="The cat sat on the mat." aria-label="default input example">
+                        <div id="sampleText" class="form-control pt-2 pb-2">The cat sat on the mat.</div>
                     </div>
                     <div class="mb-3">
                         <textarea class="form-control" id="typingArea" rows="6" placeholder="Click the start button to begin the test"></textarea>
                     </div>
                     <div id="buttonArea">
-                        <button class="btn btn-warning py-2 px-3">Start</button>
-                        <button class="btn btn-warning py-2 px-3">Stop</button>
-                        <button class="btn btn-warning py-2 px-3">Retry</button>
+                        <button id="startButton" class="btn btn-warning py-2 px-3">Start</button>
+                        <button id="stopButton" class="btn btn-warning py-2 px-3" disabled>Stop</button>
+                        <button id="retryButton" class="btn btn-warning py-2 px-3">Retry</button>
                     </div>
                 </div>
                 <div class="col-md-4 mt-3">

@@ -1,7 +1,75 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     updateSampleText();
     document.getElementById('levelSelector').addEventListener('change', updateSampleText);
+    document.getElementById('startButton').addEventListener('click', startTest);
+    document.getElementById('stopButton').addEventListener('click', stopTest);
+    document.getElementById('typingArea').addEventListener('input', checkTypingAccuracy);
 });
+
+let startTime;
+let timerInterval;
+
+/**
+ * Start the typing test.
+ * 
+ */
+function startTest() {
+    updateSampleText(); // Update the sample text with a new sentence
+    startTime = new Date();
+    document.getElementById('typingArea').value = '';
+    document.getElementById('startButton').disabled = true;
+    document.getElementById('stopButton').disabled = false;
+    document.getElementById('typingArea').focus();
+    timerInterval = setInterval(updateTime, 100);
+}
+
+/**
+ * Stop the typing test.
+ */
+function stopTest() {
+    clearInterval(timerInterval);
+    const endTime = new Date();
+    const timeTaken = (endTime - startTime) / 1000;
+    document.querySelector('.time').textContent = timeTaken.toFixed(2);
+    document.getElementById('startButton').disabled = false;
+    document.getElementById('stopButton').disabled = true;
+
+    const sampleText = document.getElementById('sampleText').textContent;
+    const userInput = document.getElementById('typingArea').value;
+    const wpm = calculateWPM(sampleText, userInput, timeTaken);
+    document.querySelector('.wordsPerMin').textContent = wpm;
+
+    const difficulty = document.getElementById('levelSelector').value;
+    document.querySelector('.level').textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+}
+
+/**
+ * Update the elapsed time on the screen.
+ */
+function updateTime() {
+    const currentTime = new Date();
+    const timeElapsed = (currentTime - startTime) / 1000;
+    document.querySelector('.time').textContent = timeElapsed.toFixed(2);
+}
+
+/**
+ * Calculate the WPM (Words per minute).
+ */
+function calculateWPM(sampleText, userInput, timeTaken) {
+    const sampleWords = sampleText.split(' ');
+    const userWords = userInput.split(' ');
+    let correctWords = 0;
+
+    for (let i = 0; i < userWords.length; i++) {
+        if (userWords[i] === sampleWords[i]) {
+            correctWords++;
+        }
+    }
+
+    const minutesTaken = timeTaken / 60;
+    const wpm = correctWords / minutesTaken;
+    return Math.round(wpm);
+}
 
 /**
  * Update the sample text based on the selected difficulty level.
@@ -68,5 +136,30 @@ function updateSampleText() {
     const selectedTexts = texts[difficulty];
     const randomText = selectedTexts[Math.floor(Math.random() * selectedTexts.length)];
 
-    sampleText.value = randomText;
+    sampleText.textContent = randomText;
+}
+
+/**
+ * Check typing accuracy and highlight incorrect words.
+ */
+function checkTypingAccuracy() {
+    const sampleText = document.getElementById('sampleText').textContent;
+    const userInput = document.getElementById('typingArea').value;
+
+    const sampleWords = sampleText.split(' ');
+    const userWords = userInput.split(' ');
+
+    let highlightedText = '';
+
+    for (let i = 0; i < sampleWords.length; i++) {
+        if (userWords[i] === undefined) {
+            highlightedText += `<span>${sampleWords[i]}</span> `;
+        } else if (userWords[i] === sampleWords[i]) {
+            highlightedText += `<span style="color: blue;">${sampleWords[i]}</span> `;
+        } else {
+            highlightedText += `<span style="color: red;">${sampleWords[i]}</span> `;
+        }
+    }
+
+    document.getElementById('sampleText').innerHTML = highlightedText.trim();
 }
