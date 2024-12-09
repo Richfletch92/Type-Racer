@@ -1,26 +1,35 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     updateSampleText();
     document.getElementById('levelSelector').addEventListener('change', updateSampleText);
-    document.getElementById('startButton').addEventListener('click', startTest);
-    document.getElementById('stopButton').addEventListener('click', stopTest);
+    document.getElementById('retryButton').addEventListener('click', resetTest); // Add this line
+    document.getElementById('typingArea').addEventListener('focus', startTest);
     document.getElementById('typingArea').addEventListener('input', checkTypingAccuracy);
+    document.getElementById('typingArea').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Disable the default function of the Enter key
+            stopTest();
+        }
+    });
+    
 });
 
 let startTime;
 let timerInterval;
+let testStarted = false;
 
 /**
  * Start the typing test.
- * 
+ * Update the sample text, start the timer, and focus on the typing area.
  */
 function startTest() {
-    updateSampleText(); // Update the sample text with a new sentence
-    startTime = new Date();
-    document.getElementById('typingArea').value = '';
-    document.getElementById('startButton').disabled = true;
-    document.getElementById('stopButton').disabled = false;
-    document.getElementById('typingArea').focus();
-    timerInterval = setInterval(updateTime, 100);
+    if (!testStarted) {
+        updateSampleText(); // Update the sample text with a new sentence
+        startTime = new Date();
+        document.getElementById('typingArea').value = '';
+        document.getElementById('typingArea').focus();
+        timerInterval = setInterval(updateTime, 100);
+        testStarted = true;
+    }
 }
 
 /**
@@ -31,8 +40,7 @@ function stopTest() {
     const endTime = new Date();
     const timeTaken = (endTime - startTime) / 1000;
     document.querySelector('.time').textContent = timeTaken.toFixed(2);
-    document.getElementById('startButton').disabled = false;
-    document.getElementById('stopButton').disabled = true;
+    testStarted = false;
 
     const sampleText = document.getElementById('sampleText').textContent;
     const userInput = document.getElementById('typingArea').value;
@@ -41,6 +49,20 @@ function stopTest() {
 
     const difficulty = document.getElementById('levelSelector').value;
     document.querySelector('.level').textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+}
+
+/**
+ * Reset the typing test.
+ */
+function resetTest() {
+    clearInterval(timerInterval);
+    document.getElementById('typingArea').value = '';
+    document.getElementById('sampleText').textContent = '';
+    document.querySelector('.time').textContent = '0';
+    document.querySelector('.wordsPerMin').textContent = '0';
+    document.querySelector('.level').textContent = 'Easy';
+    testStarted = false;
+    updateSampleText(); // Update the sample text with a new sentence
 }
 
 /**
